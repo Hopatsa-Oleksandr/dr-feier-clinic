@@ -628,7 +628,7 @@ export function App() {
           <div className="flex flex-col gap-20">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
               <div className="lg:col-span-7 flex flex-col gap-6">
-                <span className="w-max bg-amber-50 text-amber-600 text-xs font-bold px-4 py-1.5 rounded-full border border-amber-200 uppercase tracking-widest">
+                <span className="inline-block bg-amber-50 text-amber-600 text-[10px] sm:text-xs font-bold px-3 py-2 rounded-xl border border-amber-200 uppercase tracking-wider text-center leading-relaxed">
                   {t('hero_badge', 'Премиальная эстетическая медицина')}
                 </span>
                 <h1 className="text-4xl sm:text-6xl font-serif tracking-tight text-slate-900 leading-tight">
