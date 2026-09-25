@@ -95,7 +95,6 @@ export function DoctorDashboard() {
   const [isReconnecting, setIsReconnecting] = useState(false);
 
   const [reviews, setReviews] = useState<Review[]>([]);
-  const [newReview, setNewReview] = useState({ author: '', rating: 5, text: '', source: 'SITE' });
   const [replyingId, setReplyingId] = useState<string | null>(null);
   const [replyText, setReplyText] = useState('');
 
@@ -375,21 +374,6 @@ export function DoctorDashboard() {
       alert('Расход успешно добавлен');
       setNetworkError(false);
     } catch (err) { setNetworkError(true); alert('Сбой подключения. Расход не добавлен.'); }
-  };
-
-  const handleReviewSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newReview.author || !newReview.text) return;
-    try {
-      const res = await fetch('http://127.0.0.1:5000/api/reviews', { 
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(newReview) 
-      });
-      if (res.ok) { 
-        setNewReview({ author: '', rating: 5, text: '', source: 'SITE' }); 
-        fetchReviews(); 
-        alert('Отзыв успешно добавлен'); 
-      }
-    } catch (err) {}
   };
 
   const deleteReview = async (id: string) => {
@@ -761,75 +745,52 @@ export function DoctorDashboard() {
       )}
 
       {viewMode === 'reviews' && (
-        <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start animate-fade-in">
-          
-          <div className="xl:col-span-4 bg-white border border-slate-200 rounded-3xl p-6 shadow-xl sticky top-24">
-            <h3 className="font-serif text-xl text-slate-900 font-semibold mb-4">Оставить отзыв</h3>
-            <form onSubmit={handleReviewSubmit} className="flex flex-col gap-3">
-              <input type="text" required placeholder="Имя пациента" value={newReview.author} onChange={e => setNewReview({...newReview, author: e.target.value})} className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-500" />
-              <select value={newReview.rating} onChange={e => setNewReview({...newReview, rating: Number(e.target.value)})} className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-500">
-                <option value="5">5 Звезд ⭐⭐⭐⭐⭐</option>
-                <option value="4">4 Звезды ⭐⭐⭐⭐</option>
-                <option value="3">3 Звезды ⭐⭐⭐</option>
-                <option value="2">2 Звезды ⭐⭐</option>
-                <option value="1">1 Звезда ⭐</option>
-              </select>
-              <textarea required placeholder="Текст отзыва..." value={newReview.text} onChange={e => setNewReview({...newReview, text: e.target.value})} className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm min-h-[80px] focus:outline-none focus:border-amber-500 resize-none"></textarea>
-              <select value={newReview.source} onChange={e => setNewReview({...newReview, source: e.target.value})} className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-500">
-                <option value="SITE">Напрямую в клинике</option>
-                <option value="GOOGLE">Google Maps</option>
-              </select>
-              <button type="submit" className="mt-1 bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 rounded-xl uppercase text-xs tracking-wider transition-colors shadow-lg shadow-amber-500/20">Опубликовать отзыв</button>
-            </form>
-          </div>
-          
-          <div className="xl:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-            {reviews.map(r => (
-              <div key={r.id} className="bg-white border border-slate-200 p-6 rounded-3xl relative shadow-sm flex flex-col group">
-                <button onClick={() => deleteReview(r.id)} className="absolute top-4 right-4 text-slate-300 hover:text-rose-500 opacity-0 group-hover:opacity-100 transition-opacity">✕</button>
-                <div className="text-amber-400 mb-2 text-base">{'⭐'.repeat(r.rating)}</div>
-                <p className="text-sm text-slate-700 mb-4 leading-relaxed italic">"{r.text}"</p>
-                <div className="flex justify-between items-end mb-4">
-                  <div>
-                    <div className="font-bold text-sm text-slate-900 font-serif">{r.author}</div>
-                    <div className="text-[10px] text-slate-400 font-mono mt-0.5">{new Date(r.createdAt).toLocaleDateString('ru-RU')}</div>
-                  </div>
-                  <span className={`text-[9px] uppercase font-bold px-2 py-1 rounded ${r.source === 'GOOGLE' ? 'bg-blue-50 text-blue-600 border border-blue-100' : 'bg-slate-100 text-slate-500 border border-slate-200'}`}>
-                    {r.source}
-                  </span>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fade-in">
+          {reviews.map(r => (
+            <div key={r.id} className="bg-white border border-slate-200 p-6 rounded-3xl relative shadow-sm flex flex-col group">
+              <button onClick={() => deleteReview(r.id)} className="absolute top-4 right-4 text-slate-300 hover:text-rose-500 opacity-0 group-hover:opacity-100 transition-opacity">✕</button>
+              <div className="text-amber-400 mb-2 text-base">{'⭐'.repeat(r.rating)}</div>
+              <p className="text-sm text-slate-700 mb-4 leading-relaxed italic">"{r.text}"</p>
+              <div className="flex justify-between items-end mb-4">
+                <div>
+                  <div className="font-bold text-sm text-slate-900 font-serif">{r.author}</div>
+                  <div className="text-[10px] text-slate-400 font-mono mt-0.5">{new Date(r.createdAt).toLocaleDateString('ru-RU')}</div>
                 </div>
-
-                <div className="mt-auto border-t border-slate-100 pt-4">
-                  {r.reply ? (
-                    <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs text-slate-600">
-                      <span className="font-bold text-amber-600 block mb-1 uppercase tracking-wider text-[10px]">Ответ клиники:</span>
-                      {r.reply}
-                    </div>
-                  ) : replyingId === r.id ? (
-                    <div className="flex flex-col gap-2">
-                      <div className="flex flex-wrap gap-1.5 mb-1">
-                        {REPLY_TEMPLATES.map((tmpl, idx) => (
-                          <button key={idx} onClick={() => setReplyText(tmpl)} className="text-[10px] bg-amber-50 text-amber-700 border border-amber-200 px-2 py-1 rounded hover:bg-amber-100 transition-colors text-left max-w-full truncate">
-                            Шаблон {idx + 1}
-                          </button>
-                        ))}
-                      </div>
-                      <textarea value={replyText} onChange={e => setReplyText(e.target.value)} placeholder="Ваш ответ..." className="w-full text-xs p-3 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:border-amber-500 min-h-[60px] resize-none" />
-                      <div className="flex gap-2">
-                        <button onClick={() => submitReply(r.id)} className="flex-1 bg-slate-900 text-white text-xs font-bold py-2 rounded-lg uppercase hover:bg-slate-800">Ответить</button>
-                        <button onClick={() => { setReplyingId(null); setReplyText(''); }} className="px-3 bg-slate-100 text-slate-600 text-xs font-bold rounded-lg uppercase hover:bg-slate-200">Отмена</button>
-                      </div>
-                    </div>
-                  ) : (
-                    <button onClick={() => { setReplyingId(r.id); setReplyText(''); }} className="text-[10px] font-bold uppercase tracking-wider text-amber-600 hover:text-amber-800 transition-colors flex items-center gap-1">
-                      ↪ Написать ответ
-                    </button>
-                  )}
-                </div>
+                <span className={`text-[9px] uppercase font-bold px-2 py-1 rounded ${r.source === 'GOOGLE' ? 'bg-blue-50 text-blue-600 border border-blue-100' : 'bg-slate-100 text-slate-500 border border-slate-200'}`}>
+                  {r.source}
+                </span>
               </div>
-            ))}
-            {reviews.length === 0 && <div className="md:col-span-2 text-slate-400 text-sm font-medium p-6 bg-slate-50 rounded-3xl border border-dashed text-center">Отзывов пока нет.</div>}
-          </div>
+
+              <div className="mt-auto border-t border-slate-100 pt-4">
+                {r.reply ? (
+                  <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs text-slate-600">
+                    <span className="font-bold text-amber-600 block mb-1 uppercase tracking-wider text-[10px]">Ответ клиники:</span>
+                    {r.reply}
+                  </div>
+                ) : replyingId === r.id ? (
+                  <div className="flex flex-col gap-2">
+                    <div className="flex flex-wrap gap-1.5 mb-1">
+                      {REPLY_TEMPLATES.map((tmpl, idx) => (
+                        <button key={idx} onClick={() => setReplyText(tmpl)} className="text-[10px] bg-amber-50 text-amber-700 border border-amber-200 px-2 py-1 rounded hover:bg-amber-100 transition-colors text-left max-w-full truncate">
+                          Шаблон {idx + 1}
+                        </button>
+                      ))}
+                    </div>
+                    <textarea value={replyText} onChange={e => setReplyText(e.target.value)} placeholder="Ваш ответ..." className="w-full text-xs p-3 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:border-amber-500 min-h-[60px] resize-none" />
+                    <div className="flex gap-2">
+                      <button onClick={() => submitReply(r.id)} className="flex-1 bg-slate-900 text-white text-xs font-bold py-2 rounded-lg uppercase hover:bg-slate-800">Ответить</button>
+                      <button onClick={() => { setReplyingId(null); setReplyText(''); }} className="px-3 bg-slate-100 text-slate-600 text-xs font-bold rounded-lg uppercase hover:bg-slate-200">Отмена</button>
+                    </div>
+                  </div>
+                ) : (
+                  <button onClick={() => { setReplyingId(r.id); setReplyText(''); }} className="text-[10px] font-bold uppercase tracking-wider text-amber-600 hover:text-amber-800 transition-colors flex items-center gap-1">
+                    ↪ Написать ответ
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
+          {reviews.length === 0 && <div className="col-span-1 md:col-span-2 text-slate-400 text-sm font-medium p-12 bg-slate-50 rounded-3xl border border-dashed text-center">Отзывов пока нет. Ожидайте новых откликов от ваших пациентов.</div>}
         </div>
       )}
 
